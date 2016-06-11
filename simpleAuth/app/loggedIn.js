@@ -13,9 +13,6 @@ import ddpClient from './ddp';
 var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 module.exports = React.createClass({
   getInitialState() {
-
-
-
     return {
       posts: {},
       userList: {},
@@ -94,13 +91,13 @@ module.exports = React.createClass({
   handleIncrement() {
     console.log('inc');
     ddpClient.call('addPost');
-    ddpClient.call('toggleRed');
+    // ddpClient.call('toggleRed');
   },
 
   handleDecrement() {
     console.log('dec');
     ddpClient.call('deletePost');
-    ddpClient.call('toggleGreen');
+    // ddpClient.call('toggleGreen');
   },
 
   handleSignOut() {
@@ -120,7 +117,6 @@ module.exports = React.createClass({
           <Text>Posts: {count}</Text>
           <Button text="Increment and Red" onPress={this.handleIncrement}/>
           <Button text="Decrement and Green" onPress={this.handleDecrement}/>
-
           <Button text="Sign Out" onPress={this.handleSignOut}/>
         </View>
         <View>

@@ -4,7 +4,8 @@ var {
   Text,
   TextInput,
   StyleSheet,
-  AsyncStorage
+  AsyncStorage,
+  Image
 } = require('react-native');
 
 import Button from './button';
@@ -72,12 +73,19 @@ module.exports = React.createClass({
   render() {
     return (
       <View>
+        <View style={styles.containerToMid}>
+          <Image
+            source={require('../assets/sendAll.png')}
+            style={styles.topLogo}
+          />
+        </View>
         <TextInput
           style={styles.input}
           ref="email"
           onChangeText={(email) => this.setState({email: email})}
           autoCapitalize="none"
           autoCorrect={false}
+          placeholderTextColor='gray'
           placeholder="Email"
         />
         <TextInput
@@ -87,6 +95,7 @@ module.exports = React.createClass({
           autoCapitalize="none"
           autoCorrect={false}
           placeholder="Password"
+          placeholderTextColor='gray'
           secureTextEntry={true}
         />
       <Button text="Sign In" onPress={this.handleSignIn}/>
@@ -102,8 +111,21 @@ const styles = StyleSheet.create({
     width: 350,
     padding: 10,
     marginBottom: 10,
-    backgroundColor: 'white',
+    backgroundColor: '#49483E',
     borderColor: 'gray',
-    borderWidth: 1
+    color: 'white',
+    borderWidth: 1,
+    borderRadius: 5
+  },
+  text: {
+    color: 'gray'
+  },
+  topLogo: {
+    width: 100,
+    height: 100,
+    marginBottom: 20
+  },
+  containerToMid: {
+    alignItems: 'center'
   }
 })

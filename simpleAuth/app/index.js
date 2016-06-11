@@ -1,9 +1,3 @@
-// import React, {
-//   View,
-//   Text,
-//   Stylesheet
-// } from 'react-native';
-
 var React = require('react');
 var {
   View,
@@ -61,7 +55,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: '#F5FCFF'
+    backgroundColor: '#272822'
   },
   center: {
     alignItems: 'center'

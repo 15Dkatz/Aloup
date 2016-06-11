@@ -1,9 +1,3 @@
-// import React, {
-//   View,
-//   Text,
-//   TouchableOpacity,
-//   StyleSheet
-// } from 'react-native';
 var React = require('react');
 var {
   Navigator,
@@ -19,7 +13,7 @@ module.exports = React.createClass({
 
     return (
       <TouchableOpacity style={styles.button} onPress={onPress}>
-        <Text>{text}</Text>
+        <Text style={styles.text}>{text}</Text>
       </TouchableOpacity>
     )
   }
@@ -29,9 +23,15 @@ module.exports = React.createClass({
 const styles = StyleSheet.create({
   button: {
     flex: 1,
-    backgroundColor: '#eee',
+    backgroundColor: '#1f91ef',
+    borderColor: 'white',
+    borderWidth: 1,
     paddingHorizontal: 20,
     paddingVertical: 10,
-    marginVertical: 10
+    marginVertical: 10,
+    borderRadius: 5
+  },
+  text: {
+    color: 'white'
   }
 });

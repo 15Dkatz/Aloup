@@ -72,40 +72,51 @@ module.exports = React.createClass({
 
   render() {
     return (
-      <View>
-        <View style={styles.containerToMid}>
+      <View style={styles.container}>
+        <View>
           <Image
             source={require('../assets/sendAll.png')}
             style={styles.topLogo}
           />
         </View>
-        <TextInput
-          style={styles.input}
-          ref="email"
-          onChangeText={(email) => this.setState({email: email})}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholderTextColor='gray'
-          placeholder="Email"
-        />
-        <TextInput
-          style={styles.input}
-          ref="password"
-          onChangeText={(password) => this.setState({password: password})}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="Password"
-          placeholderTextColor='gray'
-          secureTextEntry={true}
-        />
-      <Button text="Sign In" onPress={this.handleSignIn}/>
-      <Button text="Sign Up" onPress={this.handleSignUp}/>
+        <View>
+          <TextInput
+            style={styles.input}
+            ref="email"
+            onChangeText={(email) => this.setState({email: email})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholderTextColor='gray'
+            placeholder="Email"
+          />
+          <TextInput
+            style={styles.input}
+            ref="password"
+            onChangeText={(password) => this.setState({password: password})}
+            autoCapitalize="none"
+            autoCorrect={false}
+            placeholder="Password"
+            placeholderTextColor='gray'
+            secureTextEntry={true}
+          />
+          <Button text="Sign In" onPress={this.handleSignIn}/>
+          <Button text="Sign Up" onPress={this.handleSignUp}/>
+        </View>
       </View>
     )
   }
 });
 
 const styles = StyleSheet.create({
+  container: {
+    alignItems: 'center',
+    flex: 1
+  },
+
+  form: {
+
+  },
+
   input: {
     height: 40,
     width: 350,
@@ -123,7 +134,8 @@ const styles = StyleSheet.create({
   topLogo: {
     width: 100,
     height: 100,
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 50
   },
   containerToMid: {
     alignItems: 'center'

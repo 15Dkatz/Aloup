@@ -1,5 +1,6 @@
 import DDPClient from 'ddp-client';
 import {AsyncStorage} from 'react-native';
+import LoggedIn from './loggedIn';
 let ddpClient = new DDPClient(
   //uncomment below for heroku
   // {
@@ -56,6 +57,7 @@ ddpClient.onAuthResponse = (err, res) => {
     ddpClient.call('addToUserList', id);
     ddpClient.call('toggleRed');
     ddpClient.call('addToUserList');
+    console.log('userLocation', LoggedIn.userLocation);
     // ddpClient.call(toggleFunction(true));
     AsyncStorage.setItem('userId', id.toString());
     AsyncStorage.setItem('loginToken', token.toString());

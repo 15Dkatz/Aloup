@@ -7,7 +7,7 @@ var {
 
 
 import ddpClient from './ddp';
-import LoggedIn from './loggedIn';
+import LoggedIn from './loggedIn_orig';
 import LoggedOut from './loggedOut';
 
 module.exports = React.createClass({
@@ -43,7 +43,7 @@ module.exports = React.createClass({
 
     return (
       <View style={styles.container}>
-        <View style={styles.center}>
+        <View>
           {body}
         </View>
       </View>
@@ -54,10 +54,7 @@ module.exports = React.createClass({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+    // justifyContent: 'center',
     backgroundColor: '#272822'
-  },
-  center: {
-    alignItems: 'center'
   }
 });

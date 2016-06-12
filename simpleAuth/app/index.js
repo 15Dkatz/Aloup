@@ -43,9 +43,7 @@ module.exports = React.createClass({
 
     return (
       <View style={styles.container}>
-        <View>
-          {body}
-        </View>
+        {body}
       </View>
     )
   }

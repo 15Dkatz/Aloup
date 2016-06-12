@@ -1,4 +1,5 @@
 var React = require('react');
+var Keyboard = require('Keyboard');
 var {
   StatusBar,
   View,
@@ -17,6 +18,16 @@ var {
 
 import Button from './button';
 import ddpClient from './ddp';
+import Notify from './notify';
+
+
+var pics = [
+    'http://coolspotters.com/files/photos/910773/spongebob-squarepants-profile.jpg',
+    'http://cdn.bleacherreport.net/images_root/users/photos/002/561/373/iloveyou_crop_150x150.png?1381122847',
+    'https://lh5.googleusercontent.com/-_ukxyc8gYIo/AAAAAAAAAAI/AAAAAAAAAJ0/fLYJaFe3GDg/w800-h800/photo.jpg',
+    'http://www.jewornotjew.com/img/people/m/mr__krabs.jpg',
+];
+
 
 var ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
 module.exports = React.createClass({
@@ -24,7 +35,9 @@ module.exports = React.createClass({
     return {
       posts: {},
       userList: {},
+      userArr: [],
       userId: '',
+      email: '',
       userListEmailArr: ['a'],
       dataSource: ds.cloneWithRows(['']),
       search: '',
@@ -38,55 +51,89 @@ module.exports = React.createClass({
         longitude: 0,
         latitudeDelta: 0,
         longitudeDelta: 0
-      }
+      },
+      viewOffset: new Animated.Value(0),
+      annotations: []
     }
   },
 
   componentDidMount() {
     this.makeSubscription();
     this.makeULSubscription();
-    this.observePosts();
+    // this.observePosts();
     this.observeUserList();
-    // _keyboardWillShowSubscription = DeviceEventEmitter.addListener('keyboardWillShow', (e) => console.log('keyboardWillShow', e));
-    // _keyboardWillHideSubscription = DeviceEventEmitter.addListener('keyboardWillHide', (e) => console.log('keyboardWillHide', e));
-    this.location();
+    DeviceEventEmitter.addListener('keyboardWillShow', (e) => {
+      Animated.timing(this.state.viewOffset, {
+        toValue: -300,
+        duration: 100
+      }).start();
+    });
 
+    DeviceEventEmitter.addListener('keyboardWillHide', (e) => {
+      Animated.timing(this.state.viewOffset, {
+        toValue: 0,
+        duration: 100
+      }).start();
+    });
+
+    this.location();
     // setInterval()
-    var changeLocation = window.setInterval(() => {this.location()}, 3000);
+    // var changeLocation = window.setInterval(() => {this.location()}, 10000);
   },
 
-  observePosts() {
-    console.log('observing posts');
+  // observePosts() {
+  //   // console.log('observing posts');
+  //   AsyncStorage.getItem('userId', (err, result) => {
+  //     this.setState({
+  //       userId: result
+  //     })
+  //   })
+  //   let observer = ddpClient.observe("posts");
+  //   observer.added = (id) => {
+  //     this.setState({posts: ddpClient.collections.posts})
+  //   }
+  //   observer.changed = (id, oldFields, clearedFields, newFields) => {
+  //     this.setState({posts: ddpClient.collections.posts})
+  //   }
+  //   observer.removed = (id, oldValue) => {
+  //     this.setState({posts: ddpClient.collections.posts})
+  //   }
+  // },
+
+  observeUserList() {
+    // console.log('observing userList');
     AsyncStorage.getItem('userId', (err, result) => {
       this.setState({
         userId: result
       })
     })
-    let observer = ddpClient.observe("posts");
-    observer.added = (id) => {
-      this.setState({posts: ddpClient.collections.posts})
-    }
-    observer.changed = (id, oldFields, clearedFields, newFields) => {
-      this.setState({posts: ddpClient.collections.posts})
-    }
-    observer.removed = (id, oldValue) => {
-      this.setState({posts: ddpClient.collections.posts})
-    }
-  },
-
-  observeUserList() {
-    console.log('observing userList');
     let ulobserver = ddpClient.observe("userList");
     ulobserver.added = (id) => {
       this.setState({userList: ddpClient.collections.userList})
-      console.log('ddpClient.collections.userList', ddpClient.collections.userList);
+      // console.log('ddpClient.collections.userList', ddpClient.collections.userList);
       let userList = ddpClient.collections.userList;
-      // let userListKeys = Object.keys(this.state.userList);
-      // let userListEmailArr = [];
-      // userListKeys.forEach((value) => {
-      //   userListEmailArr.push(userList[value].email);
-      // })
-      this.setState({dataSource: ds.cloneWithRows(userList)});
+
+      // set email
+      // console.log('email', userList);
+      var myEmail = '';
+      for (var key in userList) {
+        if (userList[key].userId==this.state.userId) {
+          myEmail = userList[key].email;
+          this.setState({
+            email: myEmail.match(/(.+)@/)[1]
+          })
+        }
+      }
+      // console.log('email', myEmail);
+      var userArr = [];
+      var count = 0;
+      for (var i in userList) {
+        userList[i].index = count;
+        userArr.push(userList[i]);
+        count++;
+      }
+      this.setState({userArr: userArr});
+      this.setState({dataSource: ds.cloneWithRows(userArr)});
     }
     ulobserver.changed = (id, oldFields, clearedFields, newFields) => {
       this.setState({userList: ddpClient.collections.userList})
@@ -130,7 +177,7 @@ module.exports = React.createClass({
   },
 
   render() {
-    var annotations = this.state.friends.map((val) => {
+    var annotations = this.state.userArr.map((val) => {
       return {
         latitude: val.latitude,
         longitude: val.longitude,
@@ -138,20 +185,36 @@ module.exports = React.createClass({
       };
     });
 
+    // this.setState({
+    //   annotations: annotations
+    // })
+
     let count = Object.keys(this.state.posts).length;
 
     return (
-      <Animated.View style={styles.container}>
+      <Animated.View style={[styles.container, {marginTop: this.state.viewOffset}]}>
+        <StatusBar
+          hidden={true}
+        />
         <View style={styles.header}>
-          <Text>UserId: {this.state.userId}</Text>
-          <Text>Posts: {count}</Text>
-          <Button text="Sign Out" onPress={this.handleSignOut}/>
+          <TouchableOpacity
+            style={styles.signOut}
+            onPress={this.handleSignOut}
+            >
+            <Text style={styles.signOutText}>Sign Out</Text>
+          </TouchableOpacity>
+          <View style={styles.userName}>
+            <Text style={styles.userNameText}>{this.state.email}</Text>
+          </View>
+          <View style={styles.signOut}></View>
         </View>
+
+
         <MapView
           style={styles.map}
-          annotations={[
-            this.state.userLocation
-          ]}
+          annotations={
+            annotations
+          }
           region={this.state.mapRegion}
         />
         <View style={styles.nav}>
@@ -164,9 +227,10 @@ module.exports = React.createClass({
               onChangeText={(text) => {
                 this.setState({
                   search: text,
-                  dataSource: ds.cloneWithRows(friends.filter((val) => {
+                  dataSource: ds.cloneWithRows(this.state.userArr.filter((val) => {
+                    // var email = val.email;
                     var regex = new RegExp(text.toLowerCase());
-                    return regex.test(val.name.toLowerCase());
+                    return regex.test(val.email.toLowerCase());
                   }))
                 })
               }}
@@ -189,21 +253,18 @@ module.exports = React.createClass({
     )
   },
   renderRow: function(row) {
+    var email = row.email ? row.email.match(/(.+)@/)[1] : null;
+    var picIndex = row.index < pics.length ? row.index : row.index %= pics.length;
+
     return (
       <View style={styles.row}>
        <Image
-         source={{uri: row.picUrl}}
+         source={{uri: pics[picIndex]}}
          style={styles.profilePic}
        />
        <View style={{flexDirection: 'column'}}>
          <Text style={styles.rowName}>
-           {row.email}
-         </Text>
-         <Text>
-           latitude: {row.latitude}
-         </Text>
-         <Text>
-           longitude: {row.longitude}
+           {email}
          </Text>
          <View style={{flexDirection: 'row'}}>
            <TouchableOpacity style={[styles.button, styles.notify]}>
@@ -257,21 +318,44 @@ module.exports = React.createClass({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 0
   },
   header: {
-    flex: 1
-  },
-  map: {
-    flex: 3
-  },
-  nav: {
-    flex: 2,
+    flex: 1,
+    flexDirection: 'row',
     backgroundColor: '#272822'
   },
-  search: {
+  signOut: {
     flex: 1,
-    borderWidth: 1,
+    alignSelf: 'center',
+  },
+  signOutText: {
+    fontSize: 16,
+    color: '#757363',
+    marginLeft: 5
+  },
+  userName: {
+    flex: 2,
+    justifyContent: 'center'
+  },
+  userNameText: {
+    fontSize: 20,
+    alignSelf: 'center',
+    margin: 7,
+    color: '#757363'
+  },
+  posText: {
+    color: '#757363',
+    marginLeft: 10
+  },
+  map: {
+    flex: 10,
+  },
+  nav: {
+    flex: 8,
+    backgroundColor: '#272822',
+  },
+  search: {
+    height: 50,
     backgroundColor: '#49483E'
   },
   searchInput:{
@@ -331,6 +415,3 @@ const styles = StyleSheet.create({
     marginRight: 10
   }
 });
-
-
-// significantly develop web-app tomorrow
